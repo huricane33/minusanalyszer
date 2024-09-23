@@ -66,7 +66,7 @@ def find_corresponding_items(df, minus_stock_items, low_sales_items, similarity_
 
 
 # Streamlit App Interface
-st.title('Stock Transfer Suggestion App')
+st.title('Minus Stock Transfer Suggestion App')
 st.write('Upload your stock and sales data, and receive stock transfer suggestions.')
 
 # File upload interface
