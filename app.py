@@ -17,7 +17,7 @@ def load_data(file_path):
 # Merge stock data with sales data
 def merge_data(stock_df, sales_df):
     # Merge datasets on 'Item Name' or 'Item ID'
-    merged_df = pd.merge(stock_df, sales_df, on='Item Name', how='left')
+    merged_df = pd.merge(stock_df, sales_df, on='Nama Item', how='left')
     return merged_df
 
 
@@ -38,17 +38,17 @@ def filter_low_sales_items(df, low_sales_threshold=5):
 def find_corresponding_items(df, minus_stock_items, low_sales_items, similarity_threshold=80):
     transfer_suggestions = []
 
-    for minus_item, minus_stock in zip(minus_stock_items['Item Name'], minus_stock_items['Stock']):
-        possible_matches = process.extract(minus_item, low_sales_items['Item Name'], scorer=fuzz.partial_ratio,
+    for minus_item, minus_stock in zip(minus_stock_items['Nama Item'], minus_stock_items['Stock']):
+        possible_matches = process.extract(minus_item, low_sales_items['Nama Item'], scorer=fuzz.partial_ratio,
                                            limit=None)
         related_items = [match[0] for match in possible_matches if match[1] >= similarity_threshold]
         related_items_df = low_sales_items[
-            low_sales_items['Item Name'].isin(related_items) & (low_sales_items['Stock'] > 0)]
+            low_sales_items['Nama Item'].isin(related_items) & (low_sales_items['Stock'] > 0)]
 
         if not related_items_df.empty:
             total_negative_stock = abs(minus_stock)
             for _, related_item in related_items_df.iterrows():
-                item_name = related_item['Item Name']
+                item_name = related_item['Nama Item']
                 available_stock = related_item['Stock']
                 transfer_amount = min(available_stock, total_negative_stock)
 
@@ -58,7 +58,7 @@ def find_corresponding_items(df, minus_stock_items, low_sales_items, similarity_
                         'To Item': minus_item,
                         'Transfer Amount': transfer_amount
                     })
-                    df.loc[df['Item Name'] == item_name, 'Stock'] -= transfer_amount
+                    df.loc[df['Nama Item'] == item_name, 'Stock'] -= transfer_amount
                     total_negative_stock -= transfer_amount
                     if total_negative_stock <= 0:
                         break
