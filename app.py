@@ -113,8 +113,18 @@ def find_corresponding_items(df, minus_stock_items, low_sales_items, similarity_
     return transfer_suggestions_df, no_suggestions_df
 
 # Streamlit App Interface
-st.title('Minus Stock Transfer Suggestion App with Price and Barcode Comparison')
+st.title('Minus Stock Transfer Suggestion App with Adjustable Parameters')
 st.write('Upload your stock, sales, and price data to receive stock transfer suggestions based on similar prices and barcodes.')
+
+# Add sliders for adjusting price difference tolerance and similarity threshold
+st.sidebar.header('Adjustment Parameters')
+
+# Price Tolerance Slider
+price_tolerance_percentage = st.sidebar.slider('Price Difference Tolerance (%)', min_value=0, max_value=100, value=10)
+price_tolerance = price_tolerance_percentage / 100  # Convert to decimal
+
+# Similarity Threshold Slider
+similarity_threshold = st.sidebar.slider('Name Similarity Threshold (%)', min_value=0, max_value=100, value=80)
 
 # File upload interface
 stock_file = st.file_uploader('Upload your Stock Data CSV', type='csv')
@@ -130,7 +140,13 @@ if stock_file and sales_file and price_file:
         merged_data = merge_data(stock_data, sales_data, price_data)
         minus_stock_items = filter_minus_stock(merged_data)
         low_sales_items = filter_low_sales_items(merged_data)
-        transfer_suggestions, no_suggestions = find_corresponding_items(merged_data, minus_stock_items, low_sales_items)
+        transfer_suggestions, no_suggestions = find_corresponding_items(
+            merged_data,
+            minus_stock_items,
+            low_sales_items,
+            similarity_threshold=similarity_threshold,
+            price_tolerance=price_tolerance
+        )
 
         st.write('Suggested Stock Transfers:')
         st.dataframe(transfer_suggestions)
